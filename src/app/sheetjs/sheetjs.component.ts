@@ -21,9 +21,13 @@ function s2ab(s: string): ArrayBuffer {
 })
 export class SheetjsComponent implements OnInit {
 
-  data: AOA = [ [1, 2], [3, 4] ];
-	wopts: XLSX.WritingOptions = { bookType: 'xlsx', type: 'binary' };
+  data: AOA = [ [], [] ];
+  wopts: XLSX.WritingOptions = { bookType: 'xlsx', type: 'binary' };
 	fileName: string = 'SheetJS.xlsx';
+	totalSheets: number = 0;
+	totalSheetsArray: number[] = [];
+	sheetNumber: number = 0;
+	targetFile : Blob;	
 
 	onFileChange(evt: any) {
 		/* wire up file reader */
@@ -35,27 +39,34 @@ export class SheetjsComponent implements OnInit {
 			const bstr: string = e.target.result;
 			const wb: XLSX.WorkBook = XLSX.read(bstr, {type: 'binary'});
 
-			/* grab first sheet */
-			const wsname: string = wb.SheetNames[0];
-			const ws: XLSX.WorkSheet = wb.Sheets[wsname];
+			this.totalSheets = wb.SheetNames.length;
+			for(let i=1; i<=this.totalSheets;i++){
+				this.totalSheetsArray.push(i);
+			}			
+		};
+		this.targetFile = target.files[0];
+		reader.readAsBinaryString(this.targetFile);
+	}
 
+	changeSheet(sheetNumber){
+		this.getSheetData(sheetNumber);
+		this.sheetNumber = sheetNumber;
+	}
+
+	getSheetData(sheetNumber){
+		const reader: FileReader = new FileReader();
+		reader.onload = (e: any) => {
+			/* read workbook */
+			const bstr: string = e.target.result;
+			const wb: XLSX.WorkBook = XLSX.read(bstr, {type: 'binary'});
+			
+			/* grab first sheet */
+			const wsname: string = wb.SheetNames[sheetNumber];
+			const ws: XLSX.WorkSheet = wb.Sheets[wsname];
 			/* save data */
 			this.data = <AOA>(XLSX.utils.sheet_to_json(ws, {header: 1}));
 		};
-		reader.readAsBinaryString(target.files[0]);
-	}
-
-	export(): void {
-		/* generate worksheet */
-		const ws: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(this.data);
-
-		/* generate workbook and add the worksheet */
-		const wb: XLSX.WorkBook = XLSX.utils.book_new();
-		XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-
-		/* save to file */
-		const wbout: string = XLSX.write(wb, this.wopts);
-		saveAs(new Blob([s2ab(wbout)]), this.fileName);
+		reader.readAsBinaryString(this.targetFile);
 	}
 
   constructor() { }
