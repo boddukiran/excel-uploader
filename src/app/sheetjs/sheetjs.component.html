@@ -1,10 +1,20 @@
+<div class="row">
 <h1>Please upload the excel file : </h1>
 <input type="file" (change)="onFileChange($event)" multiple="false" />
+</div>
 
-<h2>No.of Sheets : {{ totalSheets }}</h2>
+<h3>No.of Sheets : {{ totalSheets }}</h3>
 
-<h2>Click the Sheet Number : </h2>
+<h3>Click the Sheet Number : </h3>
 <span *ngFor='let sheetIndex of totalSheetsArray' (click)="changeSheet(sheetIndex)">[ <a href="#">{{ sheetIndex }}</a> ], </span>
+
+<h3>Choose the Sheet Number : </h3>
+<select (change)="onChange($event.target.value)" [(ngModel)]="sheetNumber">
+  <option value="0" disabled>Choose the sheet</option>
+  <option *ngFor="let sheetIndex of totalSheetsArray" value="{{sheetIndex}}">
+    {{ sheetIndex }}
+  </option>
+</select>
 
 <h2>Sheet {{ sheetNumber }} Data : </h2>
 <table class="sjs-table">

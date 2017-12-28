@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-save';
@@ -53,6 +53,10 @@ export class SheetjsComponent implements OnInit {
 		this.sheetNumber = sheetNumber;
 	}
 
+	onChange(sheetNumber) : void {
+			this.changeSheet(sheetNumber);
+	}
+	
 	getSheetData(sheetNumber){
 		const reader: FileReader = new FileReader();
 		reader.onload = (e: any) => {
